@@ -1,0 +1,73 @@
+version: '3.9'
+services:
+    app:
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+        volumes:
+            - type: bind
+              source: ./
+              target: /usr/src/app
+        command: bash -c "npm run start:debug"
+        ports:
+            - 9229:9229
+            - ${APP_PORT}:${APP_PORT}
+    postgres:
+        image: postgres:15.1
+        volumes:
+            - type: volume
+              source: postgres-data
+              target: /var/lib/postgresql/data
+        env_file:
+          - .env
+        ports:
+            - "5432:5432"
+    pgadmin4:
+        image: dpage/pgadmin4:6.14
+        restart: always
+        ports:
+            - ${PGADMIN4_PORT}:80
+        env_file:
+            - .env
+    zookeeper:
+        image: docker.io/bitnami/zookeeper:3.8
+        ports:
+            - "2181:2181"
+        volumes:
+            - type: volume
+              source: zookeeper-data
+              target: /bitnami
+        environment:
+            - ALLOW_ANONYMOUS_LOGIN=yes
+    kafka:
+        restart: always
+        image: docker.io/bitnami/kafka:3.3
+        ports:
+            - "9092:9092"
+            - "9093:9093"
+        volumes:
+            - type: volume
+              source: kafka-data
+              target: /bitnami
+        environment:
+            - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+            - ALLOW_PLAINTEXT_LISTENER=yes
+            - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+            - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+            - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+        depends_on:
+            - zookeeper
+    redpanda:
+        restart: always
+        image: docker.redpanda.com/vectorized/console:latest
+        ports:
+            - ${REDPANDA_CONSOLE_PORT}:8080
+        environment:
+            - KAFKA_BROKERS=kafka:9092
+volumes:
+    postgres-data:
+    zookeeper-data:
+        driver: local
+    kafka-data:
+        driver: local

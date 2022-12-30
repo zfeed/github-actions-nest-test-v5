@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+      "target": "esnext",
+      "strict": true,
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "exactOptionalPropertyTypes": true,
+      "noFallthroughCasesInSwitch": false,
+      "noImplicitOverride": true,
+      "noImplicitReturns": false,
+      "noPropertyAccessFromIndexSignature": true,
+      "noUncheckedIndexedAccess": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "module": "CommonJS",
+      "sourceMap": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "resolveJsonModule": true,
+      "outDir": "./dist",
+  },
+  "include": ["src/**/*", "tests/**/*"]
+}
